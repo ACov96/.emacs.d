@@ -1,0 +1,231 @@
+#+TITLE: Alex's Emacs Literate Configuration
+#+AUTHOR: Alex Covington
+#+STARTUP: overview
+
+
+* Configuration
+** Emacs Initialization
+*** Settings
+
+#+begin_src emacs-lisp
+  (menu-bar-mode -1)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+
+  (line-number-mode t)
+  (column-number-mode t)
+  (size-indication-mode t)
+
+  (setq inhibit-startup-screen t
+        inhibit-startup-message t)
+
+  (setq-default indent-tabs-mode nil)
+
+  (electric-pair-mode)
+
+  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+  (add-hook 'org-mode-hook #'display-line-numbers-mode)
+#+end_src
+
+*** Package Management
+#+begin_src emacs-lisp
+  ;; Setup MELPA and use-package
+  (require 'package)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+  (package-initialize)
+
+  (unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+#+end_src
+
+** Packages
+*** Colors & Theming
+**** monokai-theme
+#+begin_src emacs-lisp
+  (use-package monokai-theme
+    :ensure t
+    :config
+    (load-theme 'monokai 'no-confirm))
+#+end_src
+
+*** Controls & Keybindings
+**** evil-mode
+#+begin_src emacs-lisp
+  (use-package evil
+    :demand t
+    :bind (("<escape>" . keyboard-escape-quit))
+    :init
+    (setq evil-want-keybinding nil)
+    :config
+    (evil-mode 1)
+    (define-key evil-motion-state-map " " nil))
+#+end_src
+
+**** evil-collection
+#+begin_src emacs-lisp
+  (use-package evil-collection
+    :demand t
+    :after evil
+    :config
+    (setq evil-want-integration t)
+    (evil-collection-init))
+#+end_src
+
+**** general
+#+begin_src emacs-lisp
+  (use-package general
+    :demand t
+    :after evil
+    :config
+    (require 'general)
+    (general-evil-setup t)
+    (nvmap :prefix "SPC"
+      "f" 'find-file
+      "b" 'helm-buffers-list
+      "x" 'kill-buffer
+      "d" 'delete-window
+      "s" 'save-buffer
+      "SPC" 'helm-M-x
+      "/" 'split-window-right
+      "-" 'split-window-below
+      "w" 'ace-window
+      "`" 'eshell
+      "t" 'treemacs))
+#+end_src
+
+**** helm
+#+begin_src emacs-lisp
+  (use-package helm
+    :ensure t
+    :config
+    (global-set-key (kbd "M-x") 'helm-M-x))
+#+end_src
+
+**** ace-window
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :ensure t)
+#+end_src
+
+**** which-key
+#+begin_src emacs-lisp
+  (use-package which-key
+    :ensure t
+    :config
+    (which-key-mode))
+#+end_src
+        
+*** Programming Lanuages
+**** Common Lisp
+***** slime
+#+begin_src emacs-lisp
+  (use-package slime
+    :ensure t
+    :config
+    (setq inferior-lisp-program "sbcl"))
+#+end_src
+        
+*** Editing
+**** Company + LSP (and other code-completion)
+***** lsp-mode
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :init
+    (setq lsp-keymap-prefix "C-c l")
+    :hook ((c++-mode . lsp-deferred)
+           (c-or-c++-mode . lsp-deferred)
+           (lsp-mode . lsp-enable-which-key-integration))
+    :commands (lsp lsp-deferred)
+    :config
+    (setq lsp-warn-no-matched-clients nil))
+#+end_src
+
+***** lsp-ui
+#+begin_src emacs-lisp
+  (use-package lsp-ui
+    :ensure t
+    :hook (lsp-mode . lsp-ui-mode)
+    :config
+    (setq lsp-ui-doc-position 'bottom))
+#+end_src
+
+***** helm-lsp
+#+begin_src emacs-lisp
+  (use-package helm-lsp
+    :ensure t
+    :commands helm-lsp-workspace-symbol)
+#+end_src
+
+***** company
+#+begin_src emacs-lisp
+  (use-package company
+    :after lsp-mode
+    :ensure t
+    :bind
+    (:map company-active-map
+          ("<tab>" . company-complete-selection))
+    (:map lsp-mode-map
+          ("<tab>" . company-indent-or-complete-common))
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0.0))
+#+end_src
+
+***** company-box
+#+begin_src emacs-lisp
+  (use-package company-box
+    :ensure t
+    :hook (company-mode . company-box-mode))
+#+end_src
+        
+*** File Management
+**** treemacs
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :ensure t
+    :config
+    (define-key treemacs-mode-map " " nil))
+#+end_src
+
+**** treemacs-evil
+#+begin_src emacs-lisp
+  (use-package treemacs-evil
+    :ensure t
+    :after (treemacs evil))
+#+end_src
+        
+*** Org Mode
+**** General Configuration
+Hide emphasis markup for /italics/ and *bold*.
+#+begin_src emacs-lisp
+  (setq org-hide-emphasis-markers t)
+#+end_src
+
+Replace list markers with center dot.
+#+begin_src emacs-lisp
+   (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+#+end_src
+
+Nice line wrapping.
+#+begin_src emacs-lisp
+(add-hook 'org-mode-hook 'visual-line-mode)
+#+end_src
+**** org-bullets
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+end_src
+*** Git & Version Control
+**** magit
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t)
+#+end_src
