@@ -2,6 +2,34 @@
 #+AUTHOR: Alex Covington
 #+STARTUP: overview
 
+* Table of Contents                                                   :TOC_4:
+- [[#configuration][Configuration]]
+  - [[#emacs-initialization][Emacs Initialization]]
+    - [[#settings][Settings]]
+    - [[#package-management][Package Management]]
+  - [[#packages][Packages]]
+    - [[#colors--theming][Colors & Theming]]
+      - [[#monokai-theme][monokai-theme]]
+    - [[#controls--keybindings][Controls & Keybindings]]
+      - [[#evil-mode][evil-mode]]
+      - [[#evil-collection][evil-collection]]
+      - [[#general][general]]
+      - [[#helm][helm]]
+      - [[#ace-window][ace-window]]
+      - [[#which-key][which-key]]
+    - [[#programming-lanuages][Programming Lanuages]]
+      - [[#common-lisp][Common Lisp]]
+    - [[#editing][Editing]]
+      - [[#company--lsp-and-other-code-completion][Company + LSP (and other code-completion)]]
+    - [[#file-management][File Management]]
+      - [[#treemacs][treemacs]]
+      - [[#treemacs-evil][treemacs-evil]]
+    - [[#org-mode][Org Mode]]
+      - [[#general-configuration][General Configuration]]
+      - [[#org-bullets][org-bullets]]
+      - [[#toc-org][toc-org]]
+    - [[#git--version-control][Git & Version Control]]
+      - [[#magit][magit]]
 
 * Configuration
 ** Emacs Initialization
@@ -222,6 +250,14 @@ Nice line wrapping.
   (use-package org-bullets
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+end_src
+**** toc-org
+Keep the *Table of Contents* up-to-date auto-magically:
+#+begin_src emacs-lisp
+  (use-package toc-org
+    :ensure t
+    :config
+    (add-hook 'org-mode-hook 'toc-org-mode))
 #+end_src
 *** Git & Version Control
 **** magit
