@@ -10,6 +10,7 @@
   - [[#packages][Packages]]
     - [[#colors--theming][Colors & Theming]]
       - [[#monokai-theme][monokai-theme]]
+      - [[#beacon][beacon]]
     - [[#controls--keybindings][Controls & Keybindings]]
       - [[#evil-mode][evil-mode]]
       - [[#evil-collection][evil-collection]]
@@ -28,6 +29,9 @@
       - [[#general-configuration][General Configuration]]
       - [[#org-bullets][org-bullets]]
       - [[#toc-org][toc-org]]
+      - [[#mixed-pitch][mixed-pitch]]
+      - [[#org-appear][org-appear]]
+      - [[#org-superstar][org-superstar]]
     - [[#git--version-control][Git & Version Control]]
       - [[#magit][magit]]
 
@@ -53,6 +57,8 @@
 
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
   (add-hook 'org-mode-hook #'display-line-numbers-mode)
+
+  (setq visible-bell 1)
 #+end_src
 
 *** Package Management
@@ -79,7 +85,13 @@
     :config
     (load-theme 'monokai 'no-confirm))
 #+end_src
-
+**** beacon
+#+begin_src emacs-lisp
+  (use-package beacon
+    :ensure t
+    :config
+    (beacon-mode 1))
+#+end_src
 *** Controls & Keybindings
 **** evil-mode
 #+begin_src emacs-lisp
@@ -107,7 +119,6 @@
 #+begin_src emacs-lisp
   (use-package general
     :demand t
-    :after evil
     :config
     (require 'general)
     (general-evil-setup t)
@@ -119,10 +130,14 @@
       "s" 'save-buffer
       "SPC" 'helm-M-x
       "/" 'split-window-right
-      "-" 'split-window-below
+      "_" 'split-window-below
       "w" 'ace-window
       "`" 'eshell
-      "t" 'treemacs))
+      "t" 'treemacs
+      "+" 'text-scale-increase
+      "-" 'text-scale-decrease
+      "g" 'magit
+      "q" 'save-buffers-kill-terminal))
 #+end_src
 
 **** helm
@@ -211,6 +226,13 @@
     :hook (company-mode . company-box-mode))
 #+end_src
         
+***** company-posframe
+#+begin_src emacs-lisp
+  (use-package company-posframe
+    :ensure t
+    :config
+    (company-posframe-mode 1))
+#+end_src
 *** File Management
 **** treemacs
 #+begin_src emacs-lisp
@@ -245,11 +267,19 @@ Nice line wrapping.
 #+begin_src emacs-lisp
 (add-hook 'org-mode-hook 'visual-line-mode)
 #+end_src
+
+#+begin_src emacs-lisp
+  (setq org-startup-indented t
+        org-pretty-entities t
+        org-hide-emphasis-markers t
+        org-startup-with-inline-images t
+        org-image-actual-width '(300))
+#+end_src
 **** org-bullets
 #+begin_src emacs-lisp
-  (use-package org-bullets
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  ;; (use-package org-bullets
+  ;;   :config
+  ;;   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+end_src
 **** toc-org
 Keep the *Table of Contents* up-to-date auto-magically:
@@ -258,6 +288,32 @@ Keep the *Table of Contents* up-to-date auto-magically:
     :ensure t
     :config
     (add-hook 'org-mode-hook 'toc-org-mode))
+#+end_src
+**** mixed-pitch
+#+begin_src emacs-lisp
+  (use-package mixed-pitch
+    :ensure t
+    :hook
+    (text-mode . mixed-pitch-mode)
+    :config
+    (set-face-attribute 'default nil :font "Hack Nerd Font Mono" :height 130)
+    (set-face-attribute 'fixed-pitch nil :font "Hack Nerd Font Mono")
+    (set-face-attribute 'variable-pitch nil :font "Hack Nerd Font"))
+#+end_src
+**** org-appear
+#+begin_src emacs-lisp
+  (use-package org-appear
+    :ensure t
+    :hook (org-mode . org-appear-mode))
+#+end_src
+**** org-superstar
+#+begin_src emacs-lisp
+  (use-package org-superstar
+      :ensure t
+      :config
+      (setq org-superstar-special-todo-items t)
+      (add-hook 'org-mode-hook (lambda ()
+                                 (org-superstar-mode 1))))
 #+end_src
 *** Git & Version Control
 **** magit
