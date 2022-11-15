@@ -34,6 +34,10 @@
       - [[#org-superstar][org-superstar]]
     - [[#git--version-control][Git & Version Control]]
       - [[#magit][magit]]
+    - [[#utilities][Utilities]]
+      - [[#dashboard][dashboard]]
+      - [[#all-the-icons][all-the-icons]]
+      - [[#projectile][projectile]]
 
 * Configuration
 ** Emacs Initialization
@@ -137,7 +141,8 @@
       "+" 'text-scale-increase
       "-" 'text-scale-decrease
       "g" 'magit
-      "q" 'save-buffers-kill-terminal))
+      "q" 'save-buffers-kill-terminal
+      "p" 'projectile-command-map))
 #+end_src
 
 **** helm
@@ -320,4 +325,36 @@ Keep the *Table of Contents* up-to-date auto-magically:
 #+begin_src emacs-lisp
   (use-package magit
     :ensure t)
+#+end_src
+*** Utilities
+**** dashboard
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :ensure t
+    :after (all-the-icons projectile)
+    :config
+    (dashboard-setup-startup-hook)
+    (setq dashboard-center-content t
+          dashboard-banner-logo-title "Alex's Emacs"
+          dashboard-startup-banner 'logo
+          dashboard-items '((recents . 5)
+                            (projects . 5)
+                            (agenda . 5)
+                            (bookmarks . 5))
+          dashboard-set-heading-icons t
+          dashboard-set-file-icons t
+          dashboard-set-init-info t))
+#+end_src
+**** all-the-icons
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :ensure t
+    :if (display-graphic-p))
+#+end_src
+**** projectile
+#+begin_src emacs-lisp
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-mode +1))
 #+end_src
