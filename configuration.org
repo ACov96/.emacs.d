@@ -4,6 +4,8 @@
 
 * Table of Contents                                                   :TOC_4:
 - [[#about-this-config][About this config]]
+  - [[#alex-namespace][=alex/= Namespace]]
+  - [[#keyboard-navigation][Keyboard Navigation]]
 - [[#configuration][Configuration]]
   - [[#emacs-initialization][Emacs Initialization]]
     - [[#settings][Settings]]
@@ -52,6 +54,76 @@ I've been an avid Emacs enthusiast since 2016, which is not long relative to the
 In an attempt to keep my own Emacs Lisp separate from other packages, I will generally namespace my custom variables and functions with =alex/=.
 
 Much of the workflow and default keybindings are heavily inspired by [[https://www.spacemacs.org/][Spacemacs]], the spacebar is used to bring up a menu to then select the command you want to run. You can also simply press space and wait a few seconds to see what shortcuts are bound.
+
+** =alex/= Namespace
+
+I'll try my best to keep this table updated with all of the =alex/= namespaced functions and variables.
+
+| *Function*           | *Description*                                                              |
+|--------------------+--------------------------------------------------------------------------|
+| alex/dark-mode     | Set theme to "dark mode."                                                |
+|--------------------+--------------------------------------------------------------------------|
+| alex/light-mode    | Set theme to "light mode."                                               |
+|--------------------+--------------------------------------------------------------------------|
+| alex/open-config   | Open this configuration file.                                            |
+|--------------------+--------------------------------------------------------------------------|
+| alex/reload-config | Reload this configuration file (/NOTE/: You may need to just fully restart |
+|                    | Emacs, sometimes packages don't like begin reloaded more than once       |
+|                    | or need to load at startup).                                             |
+|--------------------+--------------------------------------------------------------------------|
+| alex/is-windows    | Returns =t= if current platform is Windows.                                |
+|--------------------+--------------------------------------------------------------------------|
+| alex/is-linux      | Returns =t= if current platform is Linux.                                  |
+
+
+(/No variables currently, but this is where they would go if I had some./)
+
+| *Variable* | *Description* |
+|----------+-------------|
+|          |             |
+
+** Keyboard Navigation
+
+Similar to Spacemacs, everything in this configuration is driven by the spacebar. If you want to open a file, hit =SPC f= and type the file name. Here is the (mostly) complete list of bindings:
+
+| Shortcut | Command                    | Description                                        |
+|----------+----------------------------+----------------------------------------------------|
+| SPC f    | find-file                  | Open file.                                         |
+|----------+----------------------------+----------------------------------------------------|
+| SPC b    | helm-buffers-list          | Switch/select buffer.                              |
+|----------+----------------------------+----------------------------------------------------|
+| SPC x    | kill-buffer                | Kill current buffer.                               |
+|----------+----------------------------+----------------------------------------------------|
+| SPC d    | delete-window              | Delete current window.                             |
+|----------+----------------------------+----------------------------------------------------|
+| SPC s    | save-buffer                | Save buffer to file.                               |
+|----------+----------------------------+----------------------------------------------------|
+| SPC SPC  | helm-M-x                   | Use Helm to select a command. Replaces M-x.        |
+|----------+----------------------------+----------------------------------------------------|
+| SPC /    | split-window-right         | Split window vertically, create new                |
+|          |                            | window on right side.                              |
+|----------+----------------------------+----------------------------------------------------|
+| SPC _    | split-window-below         | Split window horizontally, create new              |
+|          |                            | window on bottom.                                  |
+|----------+----------------------------+----------------------------------------------------|
+| SPC w    | ace-window                 | Switch window. If 3 or more windows exist, numbers |
+|          |                            | will show up on each window for you to select      |
+|          |                            | from.                                              |
+|----------+----------------------------+----------------------------------------------------|
+| SPC `    | eshell                     | Open the Emacs shell.                              |
+|----------+----------------------------+----------------------------------------------------|
+| SPC t    | treemacs                   | Open the Treemacs sidebar.                         |
+|----------+----------------------------+----------------------------------------------------|
+| SPC +    | text-scale-increase        | Increase text size                                 |
+|----------+----------------------------+----------------------------------------------------|
+| SPC -    | text-scale-decrease        | Decrease text size                                 |
+|----------+----------------------------+----------------------------------------------------|
+| SPC g    | magit                      | Open Magit, a Git frontend.                        |
+|----------+----------------------------+----------------------------------------------------|
+| SPC q    | save-buffers-kill-terminal | Save buffers and close Emacs, although, why        |
+|          |                            | would you want to ;).                              |
+|----------+----------------------------+----------------------------------------------------|
+| SPC p    | projectile-command-map     | Open Projectile commands.                          |
 
 * Configuration
 ** Emacs Initialization
