@@ -1,16 +1,20 @@
-#+TITLE: Alex's Emacs Literate Configuration
+#+TITLE: Alex's Emacs Configuration
 #+AUTHOR: Alex Covington
 #+STARTUP: overview
 
 * Table of Contents                                                   :TOC_4:
+- [[#about-this-config][About this config]]
 - [[#configuration][Configuration]]
   - [[#emacs-initialization][Emacs Initialization]]
     - [[#settings][Settings]]
     - [[#package-management][Package Management]]
+    - [[#helper-functions][Helper Functions]]
   - [[#packages][Packages]]
     - [[#colors--theming][Colors & Theming]]
       - [[#monokai-theme][monokai-theme]]
       - [[#beacon][beacon]]
+      - [[#color-theme-sanityinc-tomorrow][color-theme-sanityinc-tomorrow]]
+      - [[#helper-functions-1][Helper functions]]
     - [[#controls--keybindings][Controls & Keybindings]]
       - [[#evil-mode][evil-mode]]
       - [[#evil-collection][evil-collection]]
@@ -38,30 +42,54 @@
       - [[#dashboard][dashboard]]
       - [[#all-the-icons][all-the-icons]]
       - [[#projectile][projectile]]
+      - [[#olivetti][olivetti]]
+      - [[#powerline][powerline]]
+
+* About this config
+
+I've been an avid Emacs enthusiast since 2016, which is not long relative to the lifespan of Emacs. However in that time, I have learned that one of the best ways to manage the unwieldly =init.el= is to use a [[https://harryrschwartz.com/2016/02/15/switching-to-a-literate-emacs-configuration][literate configuration]] to make it easier to read and write my Emacs configuration.
+
+In an attempt to keep my own Emacs Lisp separate from other packages, I will generally namespace my custom variables and functions with =alex/=.
+
+Much of the workflow and default keybindings are heavily inspired by [[https://www.spacemacs.org/][Spacemacs]], the spacebar is used to bring up a menu to then select the command you want to run. You can also simply press space and wait a few seconds to see what shortcuts are bound.
 
 * Configuration
 ** Emacs Initialization
 *** Settings
 
+Disable annoying UI elements, we don't need them in Emacs :).
 #+begin_src emacs-lisp
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
 
+#+end_src
+
+Add line/column numbers to the modeline.
+#+begin_src emacs-lisp
   (line-number-mode t)
   (column-number-mode t)
   (size-indication-mode t)
+#+end_src
 
+Don't show the default startup screen/messages, we'll use =dashboard= for that.
+#+begin_src emacs-lisp
   (setq inhibit-startup-screen t
         inhibit-startup-message t)
+#+end_src
 
+Some miscellaneous stuff.
+#+begin_src emacs-lisp
+  ;; Don't use tabs
   (setq-default indent-tabs-mode nil)
 
+  ;; Auto-insert matching parens/brackets/quotes
   (electric-pair-mode)
 
+  ;; Always show line numbers in programming modes
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
-  (add-hook 'org-mode-hook #'display-line-numbers-mode)
 
+  ;; Turn off the bell noise, mostly for Windows
   (setq visible-bell 1)
 #+end_src
 
@@ -80,14 +108,39 @@
   (setq use-package-always-ensure t)
 #+end_src
 
+*** Helper Functions
+
+Some general helper functions for controlling Emacs.
+
+Open the config file.
+#+begin_src emacs-lisp
+  (defun alex/open-config () (interactive)
+         (find-file "~/.emacs.d/configuration.org"))
+#+end_src
+
+Reload config file.
+#+begin_src emacs-lisp
+  (defun alex/reload-config () (interactive)
+         (load-file "~/.emacs.d/init.el"))
+#+end_src
+
+Which platform are we on? Some helpers to figure that out.
+#+begin_src emacs-lisp
+  (defun alex/is-windows () (interactive)
+         (eq system-type 'windows-nt))
+  (defun alex/is-linux () (interactive)
+         (eq system-type 'gnu/linux))
+#+end_src
 ** Packages
 *** Colors & Theming
 **** monokai-theme
+
+Monokai is a great dark theme to have around and is historically my default theme, but I'm currently using =solarized-theme= to have a more consistent dark/light mode combo.
+
 #+begin_src emacs-lisp
-  (use-package monokai-theme
-    :ensure t
-    :config
-    (load-theme 'monokai 'no-confirm))
+  ;; (use-package monokai-theme
+  ;;   :disable
+  ;;   :ensure t)
 #+end_src
 **** beacon
 #+begin_src emacs-lisp
@@ -96,6 +149,23 @@
     :config
     (beacon-mode 1))
 #+end_src
+**** color-theme-sanityinc-tomorrow
+
+#+begin_src emacs-lisp
+  (use-package color-theme-sanityinc-tomorrow
+    :ensure t
+    :config
+    (color-theme-sanityinc-tomorrow-night))
+#+end_src
+**** Helper functions
+
+#+begin_src emacs-lisp
+  (defun alex/dark-mode () (interactive)
+         (color-theme-sanityinc-tomorrow-night))
+
+  (defun alex/light-mode () (interactive)
+         (color-theme-sanityinc-tomorrow-day))
+#+end_src
 *** Controls & Keybindings
 **** evil-mode
 #+begin_src emacs-lisp
@@ -103,10 +173,12 @@
     :demand t
     :bind (("<escape>" . keyboard-escape-quit))
     :init
-    (setq evil-want-keybinding nil)
+    (setq evil-want-keybinding nil
+          evil-cross-lines t)
     :config
     (evil-mode 1)
-    (define-key evil-motion-state-map " " nil))
+    (define-key evil-motion-state-map " " nil)
+    (evil-set-undo-system 'undo-redo))
 #+end_src
 
 **** evil-collection
@@ -174,7 +246,9 @@
   (use-package slime
     :ensure t
     :config
-    (setq inferior-lisp-program "sbcl"))
+    (setq inferior-lisp-program "sbcl")
+    (if (file-exists-p "~/quicklisp/slime-helper.el")
+        (load (expand-file-name "~/quicklisp/slime-helper.el"))))
 #+end_src
         
 *** Editing
@@ -280,6 +354,26 @@ Nice line wrapping.
         org-startup-with-inline-images t
         org-image-actual-width '(300))
 #+end_src
+
+Unbind the default =org-mode= header navigation bindings, it conflicts with =evil-mode= visual line movement.
+#+begin_src emacs-lisp
+  (define-key org-mode-map (kbd "<normal-state> g j") nil)
+  (define-key org-mode-map (kbd "<normal-state> g k") nil)
+#+end_src
+
+Don't display line numbers in =org-mode=
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook
+            (lambda () (display-line-numbers-mode -1)))
+#+end_src
+
+Disable auto-indentation in =org-mode= since it can conflict with =evil-mode= when writing source blocks.
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook
+            (lambda () (electric-indent-local-mode -1)))
+  (add-hook 'electric-indent-functions
+            (lambda (x) (when (eq 'org-mode major-mode) 'no-indent)))
+#+end_src
 **** org-bullets
 #+begin_src emacs-lisp
   ;; (use-package org-bullets
@@ -314,11 +408,11 @@ Keep the *Table of Contents* up-to-date auto-magically:
 **** org-superstar
 #+begin_src emacs-lisp
   (use-package org-superstar
-      :ensure t
-      :config
-      (setq org-superstar-special-todo-items t)
-      (add-hook 'org-mode-hook (lambda ()
-                                 (org-superstar-mode 1))))
+    :ensure t
+    :config
+    (setq org-superstar-special-todo-items t)
+    (add-hook 'org-mode-hook (lambda ()
+                               (org-superstar-mode 1))))
 #+end_src
 *** Git & Version Control
 **** magit
@@ -357,4 +451,24 @@ Keep the *Table of Contents* up-to-date auto-magically:
   :ensure t
   :init
   (projectile-mode +1))
+#+end_src
+**** olivetti
+
+=olivetti= is used to center text and make it easier to write prose and non-code documents.
+
+#+begin_src emacs-lisp
+  (use-package olivetti
+    :ensure t
+    :config
+    (add-hook 'olivetti-mode (lambda () (display-line-numbers-mode -1)))
+    (add-hook 'org-mode-hook 'olivetti-mode)
+    (setq olivetti-recall-visual-line-mode-entry-state t
+          olivetti-minimum-body-width 100))
+#+end_src
+**** powerline
+#+begin_src emacs-lisp
+  (use-package powerline
+    :ensure t
+    :config
+    (powerline-default-theme))
 #+end_src
