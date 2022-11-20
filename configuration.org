@@ -16,6 +16,7 @@
       - [[#monokai-theme][monokai-theme]]
       - [[#beacon][beacon]]
       - [[#color-theme-sanityinc-tomorrow][color-theme-sanityinc-tomorrow]]
+      - [[#emacs-emojify][emacs-emojify]]
       - [[#helper-functions-1][Helper functions]]
     - [[#controls--keybindings][Controls & Keybindings]]
       - [[#evil-mode][evil-mode]]
@@ -157,7 +158,6 @@ Some miscellaneous stuff.
   ;; Turn off the bell noise, mostly for Windows
   (setq visible-bell 1)
 #+end_src
-
 *** Package Management
 #+begin_src emacs-lisp
   ;; Setup MELPA and use-package
@@ -222,6 +222,15 @@ Monokai is a great dark theme to have around and is historically my default them
     :config
     (color-theme-sanityinc-tomorrow-night))
 #+end_src
+**** emacs-emojify
+Emojis! :smile: 
+
+#+begin_src emacs-lisp
+  (use-package emojify
+    :ensure t
+    :hook (after-init . global-emojify-mode))
+#+end_src
+
 **** Helper functions
 
 #+begin_src emacs-lisp
